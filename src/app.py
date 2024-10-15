@@ -9,5 +9,10 @@ def index():
     return render_template('index.html')
 
 
+@app.route('/calculator')
+def calculator():
+    return render_template('calculator.html')
+
+
 if __name__ == '__main__':
     app.run(port=8888)
