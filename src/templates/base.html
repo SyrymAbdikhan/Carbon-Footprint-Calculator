@@ -1,0 +1,24 @@
+<!DOCTYPE html>
+
+<html lang="en">
+  <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Carbon Footprint Calculator</title>
+    <link href="https://cdn.jsdelivr.net/npm/flowbite@2.5.2/dist/flowbite.min.css" rel="stylesheet" />
+    {% block style %}{% endblock %}
+  </head>
+  <body>
+    <main class="max-w-lg mx-auto p-5">
+      {% block content %}
+      <center>
+        If you see this, then error occured!
+        <a href="{{url_for('index') }}">Click here</a>
+      </center>
+      {% endblock %}
+    </main>
+
+    <script src="https://cdn.jsdelivr.net/npm/flowbite@2.5.2/dist/flowbite.min.js"></script>
+    {% block script %}{% endblock %}
+  </body>
+</html>
