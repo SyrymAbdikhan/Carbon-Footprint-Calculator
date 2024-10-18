@@ -1,5 +1,88 @@
 {% extends "base.html" %}
 
 {% block content %}
-{{data}}
+<div class="px-4 mx-auto">
+    <div id="donut">
+        <div class="hidden" id="data">
+            {% for key, value in data.items() if key != "Total" %}
+            <div data-title="{{key}}" data-value="{{value}}"></div>
+            {% endfor %}
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block script %}
+<script src="https://cdnjs.cloudflare.com/ajax/libs/d3/4.6.0/d3.min.js"></script>
+ 
+<script>
+    var data = [...document.querySelectorAll('#data>div')].map(div => {
+        return {
+            title: div.getAttribute('data-title'),
+            value: parseFloat(div.getAttribute('data-value'))
+        };
+    });
+    
+    var width = 360;
+    var height = 360;
+    var radius = Math.min(width, height) / 2;
+    var donutWidth = 75;
+
+    // var color = d3.scaleOrdinal(d3.schemeCategory10);
+    // custom color scheme
+    var color = d3.scaleOrdinal().range(["#FF6B6B", "#4D96FF", "#6BCB77"]);
+
+    var svg = d3.select('#donut')
+        .append('svg')
+        .attr('class', 'mx-auto w-full max-w-sm')
+        .attr('viewBox', `0 0 ${width} ${height}`)
+        .attr('style', 'aspect-ratio: 1/1;')
+        .append('g')
+        .attr('transform', 'translate(' + (width / 2) + ',' + (height / 2) + ')');
+    var arc = d3.arc()
+        .innerRadius(radius - donutWidth)
+        .outerRadius(radius);
+    var pie = d3.pie()
+        .value(function (d) {
+            return d.value;
+        })
+        .sort(null);
+    var path = svg.selectAll('path')
+        .data(pie(data))
+        .enter()
+        .append('path')
+        .attr('d', arc)
+        .attr('fill', function (d, i) {
+            return color(d.data.title);
+        })
+        .attr('transform', 'translate(0, 0)');
+    
+    var legendRectSize = 14;
+    var legendSpacing = 6;
+    var legend = svg.selectAll('.legend')
+        .data(color.domain())
+        .enter()
+        .append('g')
+        .attr('class', 'circle-legend')
+        .attr('transform', function (d, i) {
+            var height = legendRectSize + legendSpacing;
+            var offset = height * color.domain().length / 2;
+            var horz = -2 * legendRectSize - 13;
+            var vert = i * height - offset;
+            return 'translate(' + horz + ',' + vert + ')';
+        });
+    
+    legend.append('circle')
+        .style('fill', color)
+        .style('stroke', color)
+        .attr('cx', 0)
+        .attr('cy', 0)
+        .attr('r', '.5rem');
+    legend.append('text')
+        .attr('x', legendRectSize + legendSpacing)
+        .attr('y', legendRectSize - legendSpacing)
+        .text(function (d) {
+            return d;
+        });
+</script>
 {% endblock %}
