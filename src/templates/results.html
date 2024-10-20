@@ -14,75 +14,94 @@
 
 {% block script %}
 <script src="https://cdnjs.cloudflare.com/ajax/libs/d3/4.6.0/d3.min.js"></script>
- 
+
 <script>
     var data = [...document.querySelectorAll('#data>div')].map(div => {
         return {
-            title: div.getAttribute('data-title'),
+            label: div.getAttribute('data-title'),
             value: parseFloat(div.getAttribute('data-value'))
         };
     });
-    
-    var width = 360;
-    var height = 360;
-    var radius = Math.min(width, height) / 2;
-    var donutWidth = 75;
 
-    // var color = d3.scaleOrdinal(d3.schemeCategory10);
-    // custom color scheme
-    var color = d3.scaleOrdinal().range(["#FF6B6B", "#4D96FF", "#6BCB77"]);
+    var width = 600,
+        height = 450,
+        radius = Math.min(width, height) / 2;
 
-    var svg = d3.select('#donut')
-        .append('svg')
-        .attr('class', 'mx-auto w-full max-w-sm')
+    var svg = d3.select("#donut")
+        .append("svg")
         .attr('viewBox', `0 0 ${width} ${height}`)
-        .attr('style', 'aspect-ratio: 1/1;')
-        .append('g')
-        .attr('transform', 'translate(' + (width / 2) + ',' + (height / 2) + ')');
-    var arc = d3.arc()
-        .innerRadius(radius - donutWidth)
-        .outerRadius(radius);
+        .append("g")
+        .attr("transform", "translate(" + width / 2 + "," + height / 2 + ")");
+
+    svg.append("g")
+        .attr("class", "slices");
+    svg.append("g")
+        .attr("class", "labels");
+    svg.append("g")
+        .attr("class", "lines");
+
     var pie = d3.pie()
-        .value(function (d) {
+        .sort(null)
+        .value(function(d) {
             return d.value;
-        })
-        .sort(null);
-    var path = svg.selectAll('path')
-        .data(pie(data))
-        .enter()
-        .append('path')
-        .attr('d', arc)
-        .attr('fill', function (d, i) {
-            return color(d.data.title);
-        })
-        .attr('transform', 'translate(0, 0)');
-    
-    var legendRectSize = 14;
-    var legendSpacing = 6;
-    var legend = svg.selectAll('.legend')
-        .data(color.domain())
-        .enter()
-        .append('g')
-        .attr('class', 'circle-legend')
-        .attr('transform', function (d, i) {
-            var height = legendRectSize + legendSpacing;
-            var offset = height * color.domain().length / 2;
-            var horz = -2 * legendRectSize - 13;
-            var vert = i * height - offset;
-            return 'translate(' + horz + ',' + vert + ')';
         });
+
+    var arc = d3.arc()
+        .outerRadius(radius * 0.8)
+        .innerRadius(radius * 0.4);
+
+    var outerArc = d3.arc()
+        .innerRadius(radius * 0.9)
+        .outerRadius(radius * 0.9);
+
+    var color = d3.scaleOrdinal()
+        .range(["#6b486b", "#a05d56", "#d0743c", "#ff8c00", "#98abc5", "#8a89a6", "#7b6888"]);
     
-    legend.append('circle')
-        .style('fill', color)
-        .style('stroke', color)
-        .attr('cx', 0)
-        .attr('cy', 0)
-        .attr('r', '.5rem');
-    legend.append('text')
-        .attr('x', legendRectSize + legendSpacing)
-        .attr('y', legendRectSize - legendSpacing)
-        .text(function (d) {
-            return d;
+    var key = function(d){ return d.data.label; };
+
+    function midAngle(d){
+        return d.startAngle + (d.endAngle - d.startAngle)/2;
+    }
+
+    /* ------- PIE SLICES ------- */
+    var slice = svg.select(".slices").selectAll("path.slice")
+        .data(pie(data), key)
+        .enter()
+        .insert("path")
+        .style("fill", function(d) { return color(d.data.label); })
+        .attr("class", "slice")
+        .attr("d", arc);
+
+    slice.exit().remove();
+
+    /* ------- TEXT LABELS ------- */
+    var text = svg.select(".labels").selectAll("text")
+        .data(pie(data), key)
+        .enter()
+        .append("text")
+        .attr("dy", ".35em")
+        .text(function(d) {
+            return d.data.label;
+        })
+        .attr("transform", function(d) {
+            var pos = outerArc.centroid(d);
+            pos[0] = radius * (midAngle(d) < Math.PI ? 1 : -1);
+            return "translate("+ pos +")";
+        })
+        .style("text-anchor", function(d){
+            return midAngle(d) < Math.PI ? "start":"end";
+        });
+
+    /* ------- SLICE TO TEXT POLYLINES ------- */
+    var polyline = svg.select(".lines").selectAll("polyline")
+        .data(pie(data), key)
+        .enter()
+        .append("polyline")
+        .attr("style", "opacity: .3; stroke: black; stroke-width: 2px; fill: none;")
+        .attr("points", function(d){
+            var pos = outerArc.centroid(d);
+            pos[0] = radius * 0.95 * (midAngle(d) < Math.PI ? 1 : -1);
+            return [arc.centroid(d), outerArc.centroid(d), pos];
         });
 </script>
 {% endblock %}
