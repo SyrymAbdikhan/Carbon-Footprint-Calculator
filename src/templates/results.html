@@ -1,7 +1,7 @@
 {% extends "base.html" %}
 
 {% block content %}
-<div class="px-4 mx-auto">
+<div class="px-4 mx-auto">    
     <section class="bg-center bg-no-repeat  rounded-lg bg-gray-700 bg-blend-multiply">
         <div class="px-4 mx-auto max-w-screen-xl text-center py-24 lg:py-56">
             <h1 class="mb-4 text-3xl font-extrabold tracking-tight leading-none text-white md:text-4xl lg:text-5xl">Your footprint is equal to</h1>
@@ -48,7 +48,7 @@
         </div>
     </div>
         
-    <div id="donut">
+    <div id="donut" class="my-4">
         <div class="hidden" id="data" data-total="{{data['Total']}}">
             {% for key, value in data.items() if key != "Total" %}
             <div data-title="{{key}}" data-value="{{value}}"></div>
@@ -103,7 +103,7 @@
         .outerRadius(radius * 0.9);
 
     var color = d3.scaleOrdinal()
-        .range(["#6b486b", "#a05d56", "#d0743c", "#ff8c00", "#98abc5", "#8a89a6", "#7b6888"]);
+        .range(["#6875f5", "#ff5b1f", "#0695a2"]);
     
     var key = function(d){ return d.data.label; };
 
