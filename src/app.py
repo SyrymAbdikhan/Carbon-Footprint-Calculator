@@ -4,6 +4,7 @@ from flask import Flask, request, session, redirect, render_template
 from utils import calculate_co2, cast
 
 app = Flask(__name__)
+# store secret_key in .env file, this is only for testing purposes
 app.secret_key = '!!r&W!D2pmyqBInQxRytHZh0aY+eGjWQtF&9Jg2P|dXN1cWv6Dza0S5Gak0AHQsZ'
 
 
@@ -31,9 +32,17 @@ def calculator():
     return redirect('/results')
 
 
+@app.route('/noresults/')
+def noresults():
+    return render_template('noresults.html')    
+
+
 @app.route('/results/')
 def results():
-    return render_template('results.html', data=session.get('resp'))
+    data = session.get('resp')
+    if data is None:
+        return redirect('/noresults')
+    return render_template('results.html', data=data)
 
 
 if __name__ == '__main__':
