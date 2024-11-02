@@ -19,22 +19,22 @@ def calculator():
         return render_template('calculator.html')
 
     data = {
-        'mo-elec-bill': cast(request.form.get('mo-elec-bill', 0), float, 0),
-        'mo-gas-bill': cast(request.form.get('mo-gas-bill', 0), float, 0),
-        'mo-fuel-bill': cast(request.form.get('mo-fuel-bill', 0), float, 0),
-        'mo-waste-kg': cast(request.form.get('mo-waste-kg', 0), float, 0),
-        'waste-rec-pct': cast(request.form.get('waste-rec-pct', 0), float, 0),
-        'yr-travel-km': cast(request.form.get('yr-travel-km', 0), float, 0),
-        '100km-eff-ltr': cast(request.form.get('100km-eff-ltr', 0), float, 0)
+        'elec-bill': cast(request.form.get('elec-bill', 0), float, 0),
+        'gas-bill': cast(request.form.get('gas-bill', 0), float, 0),
+        'fuel-bill': cast(request.form.get('fuel-bill', 0), float, 0),
+        'waste-kg': cast(request.form.get('waste-kg', 0), float, 0),
+        'recycle-pct': cast(request.form.get('recycle-pct', 0), float, 0),
+        'km-traveled': cast(request.form.get('km-traveled', 0), float, 0),
+        'fuel-eff': cast(request.form.get('fuel-eff', 0), float, 0)
     }
     session['resp'] = calculate_co2(data)
-    
+
     return redirect('/results')
 
 
 @app.route('/noresults/')
 def noresults():
-    return render_template('noresults.html')    
+    return render_template('noresults.html')
 
 
 @app.route('/results/')
