@@ -21,10 +21,10 @@ def calculate_co2(data: dict):
     total_co2 = total_energy_usage + total_waste + total_travel
 
     return {
-        'Energy Usage': total_energy_usage,
-        'Waste': total_waste,
-        'Travel': total_travel,
-        'Total': total_co2
+        'energy-usage': total_energy_usage,
+        'waste': total_waste,
+        'travel': total_travel,
+        'total': total_co2
     }
 
 

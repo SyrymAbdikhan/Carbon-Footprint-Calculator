@@ -5,7 +5,7 @@
     <section class="bg-center bg-no-repeat  rounded-lg bg-gray-700 bg-blend-multiply">
         <div class="px-4 mx-auto max-w-screen-xl text-center py-24 lg:py-56">
             <h1 class="mb-4 text-3xl font-extrabold tracking-tight leading-none text-white md:text-4xl lg:text-5xl">Your footprint is equal to</h1>
-            <h1 class="mb-4 text-4xl font-extrabold tracking-tight leading-none text-white md:text-5xl lg:text-6xl">{{ (data['Total']/1000)|round(1) }} tonnes</h1>
+            <h1 class="mb-4 text-4xl font-extrabold tracking-tight leading-none text-white md:text-5xl lg:text-6xl">{{ (data.total_co2/1000)|round(1) }} tonnes</h1>
         </div>
     </section>
 
@@ -18,7 +18,7 @@
             </div>
             <div class="flex flex-col justify-between p-4 leading-normal">
                 <h5 class="mb-2 text-2xl font-bold tracking-tight text-gray-900 dark:text-white">Energy Usage</h5>
-                <p class="mb-3 font-normal text-gray-700 dark:text-gray-400">Your consumption is equal to {{ (data['Energy Usage']/1000)|round(1) }} tonnes</p>
+                <p class="mb-3 font-normal text-gray-700 dark:text-gray-400">Your consumption is equal to {{ (data.energy_co2/1000)|round(1) }} tonnes</p>
             </div>
         </div>
         <div class="flex items-center bg-white border border-gray-200 rounded-lg shadow md:flex-row dark:border-gray-700 dark:bg-gray-800">
@@ -32,7 +32,7 @@
             </div>
             <div class="flex flex-col justify-between p-4 leading-normal">
                 <h5 class="mb-2 text-2xl font-bold tracking-tight text-gray-900 dark:text-white">Waste</h5>
-                <p class="mb-3 font-normal text-gray-700 dark:text-gray-400">Your consumption is equal to {{ (data['Waste']/1000)|round(1) }} tonnes</p>
+                <p class="mb-3 font-normal text-gray-700 dark:text-gray-400">Your consumption is equal to {{ (data.waste_co2/1000)|round(1) }} tonnes</p>
             </div>
         </div>
         <div class="flex items-center bg-white border border-gray-200 rounded-lg shadow md:flex-row dark:border-gray-700 dark:bg-gray-800">
@@ -43,16 +43,16 @@
             </div>
             <div class="flex flex-col justify-between p-4 leading-normal">
                 <h5 class="mb-2 text-2xl font-bold tracking-tight text-gray-900 dark:text-white">Travel</h5>
-                <p class="mb-3 font-normal text-gray-700 dark:text-gray-400">Your consumption is equal to {{ (data['Travel']/1000)|round(1) }} tonnes</p>
+                <p class="mb-3 font-normal text-gray-700 dark:text-gray-400">Your consumption is equal to {{ (data.travel_co2/1000)|round(1) }} tonnes</p>
             </div>
         </div>
     </div>
         
     <div id="donut" class="my-4">
-        <div class="hidden" id="data" data-total="{{data['Total']}}">
-            {% for key, value in data.items() if key != "Total" %}
-            <div data-title="{{key}}" data-value="{{value}}"></div>
-            {% endfor %}
+        <div class="hidden" id="data" data-total="{{data.total_co2}}">
+            <div data-title="Energy Usage" data-value="{{data.energy_co2}}"></div>
+            <div data-title="Waste" data-value="{{data.waste_co2}}"></div>
+            <div data-title="Travel" data-value="{{data.travel_co2}}"></div>
         </div>
     </div>
 </div>

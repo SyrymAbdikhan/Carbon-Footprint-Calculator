@@ -1,11 +1,24 @@
 
-from flask import Flask, request, session, redirect, render_template
+import os
 
 from utils import calculate_co2, cast
+from models import db, CompanyEmissions
+
+from flask import Flask, request, redirect, render_template
+
+from dotenv import load_dotenv
+load_dotenv('.env')
+
+
+basedir = os.path.abspath(os.path.dirname(__file__))
 
 app = Flask(__name__)
-# store secret_key in .env file, this is only for testing purposes
-app.secret_key = '!!r&W!D2pmyqBInQxRytHZh0aY+eGjWQtF&9Jg2P|dXN1cWv6Dza0S5Gak0AHQsZ'
+app.secret_key = os.getenv('SECRET_KEY')
+app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///' + \
+    os.path.join(basedir, 'database.db')
+app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
+
+db.init_app(app)
 
 
 @app.route('/')
@@ -27,9 +40,27 @@ def calculator():
         'km-traveled': cast(request.form.get('km-traveled', 0), float, 0),
         'fuel-eff': cast(request.form.get('fuel-eff', 0), float, 0)
     }
-    session['resp'] = calculate_co2(data)
+    resp = calculate_co2(data)
 
-    return redirect('/results')
+    comp_emisson = CompanyEmissions(
+        name=request.form.get('comp-name', 'Unknown'),
+        elec_bill=data.get('elec-bill', 0),
+        gas_bill=data.get('gas-bill', 0),
+        fuel_bill=data.get('fuel-bill', 0),
+        waste_kg=data.get('waste-kg', 0),
+        recycle_pct=data.get('recycle-pct', 0),
+        km_traveled=data.get('km-traveled', 0),
+        fuel_eff=data.get('fuel-eff', 0),
+        energy_co2=resp.get('energy-usage', 0),
+        waste_co2=resp.get('waste', 0),
+        travel_co2=resp.get('travel', 0),
+        total_co2=resp.get('total', 0),
+    )
+
+    db.session.add(comp_emisson)
+    db.session.commit()
+
+    return redirect(f'/results/{comp_emisson.id}')
 
 
 @app.route('/noresults/')
@@ -38,10 +69,15 @@ def noresults():
 
 
 @app.route('/results/')
-def results():
-    data = session.get('resp')
+@app.route('/results/<int:result_id>')
+def results(result_id=None):
+    if result_id is None:
+        redirect('index')
+
+    data = CompanyEmissions.query.filter_by(id=result_id).first()
     if data is None:
         return redirect('/noresults')
+
     return render_template('results.html', data=data)
 
 
