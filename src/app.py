@@ -5,6 +5,7 @@ from utils import calculate_co2, cast
 from models import db, CompanyEmissions
 
 from flask import Flask, request, redirect, render_template
+from sqlalchemy import desc
 
 from dotenv import load_dotenv
 load_dotenv('.env')
@@ -79,6 +80,20 @@ def results(result_id=None):
         return redirect('/noresults')
 
     return render_template('results.html', data=data)
+
+
+@app.route('/all_results/')
+def all_results():
+    page = request.args.get('page', 1, type=int)
+
+    pagination = CompanyEmissions.query.order_by(
+        desc(CompanyEmissions.created_at)
+    ).paginate(page=page, per_page=10)
+    
+    if pagination is None:
+        return redirect('/noresults')
+
+    return render_template('all_results.html', pagination=pagination)
 
 
 if __name__ == '__main__':
