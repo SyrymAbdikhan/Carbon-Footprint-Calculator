@@ -78,8 +78,22 @@ def results(result_id=None):
     data = CompanyEmissions.query.filter_by(id=result_id).first()
     if data is None:
         return redirect('/noresults')
+    
+    averages = db.session.query(
+        db.func.avg(CompanyEmissions.energy_co2),
+        db.func.avg(CompanyEmissions.waste_co2),
+        db.func.avg(CompanyEmissions.travel_co2),
+        db.func.avg(CompanyEmissions.total_co2)
+    ).one()
+    
+    averages = {
+        'energy_co2': averages[0],
+        'waste_co2': averages[1],
+        'travel_co2': averages[2],
+        'total_co2': averages[3],
+    }
 
-    return render_template('results.html', data=data)
+    return render_template('results.html', data=data, averages=averages)
 
 
 @app.route('/all_results/')
