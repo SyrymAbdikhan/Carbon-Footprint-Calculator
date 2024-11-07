@@ -26,6 +26,19 @@ class CompanyEmissions(db.Model):
     waste_co2 = db.Column(db.Float)
     travel_co2 = db.Column(db.Float)
     total_co2 = db.Column(db.Float)
+    
+    suggestion = db.relationship('ReductionSuggestions', backref='company_emissions', uselist=False)
 
     def __repr__(self):
-        return f"<Company '{self.name}' {self.created_at}>"
+        return f"<CompanyEmissions {self.id}>"
+
+
+class ReductionSuggestions(db.Model):
+    __tablename__ = 'reduction_suggestions'
+    
+    id = db.Column(db.Integer, primary_key=True)
+    result_id = db.Column(db.Integer, db.ForeignKey('company_emissions.id'), nullable=False)
+    suggestion = db.Column(db.Text)
+
+    def __repr__(self):
+        return f"<ReductionSuggestions {self.id}>"

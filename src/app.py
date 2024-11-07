@@ -1,8 +1,8 @@
 
 import os
 
-from utils import calculate_co2, cast
-from models import db, CompanyEmissions
+from utils import calculate_co2, get_db_average, get_ai_suggestion, cast
+from models import db, CompanyEmissions, ReductionSuggestions
 
 from flask import Flask, request, redirect, render_template
 from sqlalchemy import desc
@@ -78,22 +78,44 @@ def results(result_id=None):
     data = CompanyEmissions.query.filter_by(id=result_id).first()
     if data is None:
         return redirect('/noresults')
-    
-    averages = db.session.query(
-        db.func.avg(CompanyEmissions.energy_co2),
-        db.func.avg(CompanyEmissions.waste_co2),
-        db.func.avg(CompanyEmissions.travel_co2),
-        db.func.avg(CompanyEmissions.total_co2)
-    ).one()
-    
-    averages = {
-        'energy_co2': averages[0],
-        'waste_co2': averages[1],
-        'travel_co2': averages[2],
-        'total_co2': averages[3],
-    }
 
-    return render_template('results.html', data=data, averages=averages)
+    return render_template('results.html', data=data, averages=get_db_average())
+
+
+@app.route('/get_suggestion/')
+def get_suggestion():
+    result_id = request.args.get('result_id', None, type=int)
+    if result_id is None:
+        return {
+            'status_code': 1,
+            'response': ''
+        }
+
+    data = CompanyEmissions.query.filter_by(id=result_id).first()
+    if data.suggestion is None:
+        response = get_ai_suggestion(data)
+        if response['status_code'] != 0:
+            return {
+                'status_code': 2,
+                'response': response['suggestion']
+            }
+
+        suggestion = ReductionSuggestions(
+            result_id=result_id,
+            suggestion=response['suggestion']
+        )
+        db.session.add(suggestion)
+        db.session.commit()
+
+        return {
+            'status_code': 0,
+            'response': response['suggestion']
+        }
+
+    return {
+        'status_code': 0,
+        'response': data.suggestion.suggestion
+    }
 
 
 @app.route('/all_results/')
@@ -103,7 +125,7 @@ def all_results():
     pagination = CompanyEmissions.query.order_by(
         desc(CompanyEmissions.created_at)
     ).paginate(page=page, per_page=10)
-    
+
     if pagination is None:
         return redirect('/noresults')
 
