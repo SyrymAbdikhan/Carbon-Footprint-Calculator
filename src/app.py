@@ -61,7 +61,7 @@ def calculator():
     db.session.add(comp_emisson)
     db.session.commit()
 
-    return redirect(f'/results/{comp_emisson.id}')
+    return redirect(f'/results/?result_id={comp_emisson.id}')
 
 
 @app.route('/noresults/')
@@ -70,8 +70,8 @@ def noresults():
 
 
 @app.route('/results/')
-@app.route('/results/<int:result_id>')
-def results(result_id=None):
+def results():
+    result_id = request.args.get('result_id', None, type=int)
     if result_id is None:
         redirect('index')
 

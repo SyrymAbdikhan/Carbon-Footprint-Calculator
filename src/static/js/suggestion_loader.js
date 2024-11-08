@@ -2,8 +2,8 @@
 var suggestion = document.querySelector('#suggestion');
 var btn = document.querySelector('#generate-suggestion');
 var spinner = document.querySelector('#spinner');
-var href = window.location.href;
-var result_id = href.substring(href.lastIndexOf('/') + 1);
+var url = new URL(window.location.href);
+var result_id = url.searchParams.get("result_id");
 
 btn.addEventListener('click', () => {
     btn.classList.add("pointer-events-none");
