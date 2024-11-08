@@ -32,7 +32,7 @@ def get_ai_suggestion(company: CompanyEmissions, averages: dict = None):
         'Authorization': f'Bearer {os.getenv("API_KEY")}'
     }
 
-    prompt = os.getenv('PROMPT').format(
+    prompt = os.getenv('AI_PROMPT').format(
         elec_bill=company.elec_bill,
         gas_bill=company.gas_bill,
         fuel_bill=company.fuel_bill,

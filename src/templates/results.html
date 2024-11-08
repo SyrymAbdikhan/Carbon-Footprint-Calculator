@@ -12,6 +12,18 @@
     #suggestion ul, #suggestion ol {
         margin-left: 1rem;
     }
+    #suggestion li {
+        margin-bottom: 0.5rem;
+    }
+    #suggestion ol>li {
+        position: relative;
+        padding-left: 0.8rem;
+    }
+    #suggestion ol>li::before {
+        content: "• ";
+        position: absolute;
+        left: 0;
+    }
     #suggestion strong {
         font-weight: 700;
     }
@@ -212,7 +224,7 @@
         <hr class="mb-2">
         <div class="" id="suggestion">
             {% if data.suggestion %}
-                {{data.suggestion.suggestion|e}}
+                {{'\n' + data.suggestion.suggestion|e}}
             {% else %}
                 <div role="status" class="w-fit mx-auto my-4" id="spinner">
                     <svg aria-hidden="true" class="w-8 h-8 text-gray-200 animate-spin dark:text-gray-600 fill-blue-600" viewBox="0 0 100 101" fill="none" xmlns="http://www.w3.org/2000/svg">
