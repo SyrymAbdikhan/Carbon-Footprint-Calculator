@@ -3,31 +3,7 @@
 {% block head %}
 <script src="https://unpkg.com/commonmark@0.29.3/dist/commonmark.js"></script>
 
-<style>
-    #suggestion h1 {
-        margin-top: 1rem;
-        font-weight: bold;
-        font-size: large;
-    }
-    #suggestion ul, #suggestion ol {
-        margin-left: 1rem;
-    }
-    #suggestion li {
-        margin-bottom: 0.5rem;
-    }
-    #suggestion ol>li {
-        position: relative;
-        padding-left: 0.8rem;
-    }
-    #suggestion ol>li::before {
-        content: "• ";
-        position: absolute;
-        left: 0;
-    }
-    #suggestion strong {
-        font-weight: 700;
-    }
-</style>
+<link rel="stylesheet" href="{{ url_for('static', filename='css/results.css') }}">
 {% endblock %}
 
 {% block content %}
@@ -248,153 +224,16 @@
 {% block script %}
 <script src="https://cdnjs.cloudflare.com/ajax/libs/d3/4.6.0/d3.min.js"></script>
 
-<script>
-    var suggestion = document.querySelector('#suggestion');
-    function prettify() {
-        var reader = new commonmark.Parser();
-        var writer = new commonmark.HtmlRenderer();
-        var parsed = reader.parse(suggestion.innerHTML);
-        suggestion.innerHTML = writer.render(parsed);
-    }
-</script>
+<script src="{{ url_for('static', filename='js/prettifier.js') }}"></script>
 
 {% if data.suggestion %}
 <script>
-    prettify()
+    var suggestion = document.querySelector('#suggestion');
+    prettify(suggestion);
 </script>
 {% else %}
-<script>
-    var btn = document.querySelector('#generate-suggestion');
-    var spinner = document.querySelector('#spinner');
-    btn.addEventListener('click', () => {
-        btn.classList.add("pointer-events-none");
-        btn.classList.remove("hover:bg-blue-500");
-        spinner.style.display = 'block';
-
-        fetch('/get_suggestion/?result_id={{data.id}}')
-            .then((response) => {
-                return response.json();
-            })
-            .then((data) => {
-                if (data.status_code == 0) {
-                    suggestion.textContent = data.response;
-                    prettify();
-                } else {
-                    alert(data.response);
-                }
-            })
-            .catch(() => {
-                alert('oblom');
-                btn.classList.remove("pointer-events-none");
-                btn.classList.add("hover:bg-blue-500");
-                spinner.style.display = 'none';
-            });
-    });
-    btn.click();
-</script>
+<script src="{{ url_for('static', filename='js/suggestion_loader.js') }}"></script>
 {% endif %}
 
-<script>
-    var total = parseFloat(document.querySelector('#data').getAttribute('data-total'));
-    var data = [...document.querySelectorAll('#data>div')].map(div => {
-        return {
-            label: div.getAttribute('data-title'),
-            value: parseFloat(div.getAttribute('data-value')) * 100 / total
-        };
-    });
-
-    var width = 700,
-        height = 450,
-        radius = Math.min(width, height) / 2;
-
-    var svg = d3.select("#donut")
-        .append("svg")
-        .attr("viewBox", `0 0 ${width} ${height}`)
-        .attr("class", "max-w-xl mx-auto")
-        .append("g")
-        .attr("transform", "translate(" + width / 2 + "," + height / 2 + ")");
-
-    svg.append("g")
-        .attr("class", "slices");
-    svg.append("g")
-        .attr("class", "labels");
-    svg.append("g")
-        .attr("class", "lines");
-
-    var pie = d3.pie()
-        .sort(null)
-        .value(function(d) {
-            return d.value;
-        });
-
-    var arc = d3.arc()
-        .outerRadius(radius * 0.8)
-        .innerRadius(radius * 0.4);
-
-    var outerArc = d3.arc()
-        .innerRadius(radius * 0.9)
-        .outerRadius(radius * 0.9);
-
-    var color = d3.scaleOrdinal()
-        .range(["#6875f5", "#ff5b1f", "#0695a2"]);
-    
-    var key = function(d){ return d.data.label; };
-
-    function midAngle(d){
-        return d.startAngle + (d.endAngle - d.startAngle)/2;
-    }
-
-    /* ------- PIE SLICES ------- */
-    var slice = svg.select(".slices").selectAll("path.slice")
-        .data(pie(data), key)
-        .enter()
-        .insert("path")
-        .style("fill", function(d) { return color(d.data.label); })
-        .attr("class", "slice")
-        .attr("d", arc);
-
-    slice.exit().remove();
-
-    /* ------- TEXT LABELS ------- */
-    var text = svg.select(".labels").selectAll("text")
-        .data(pie(data), key)
-        .enter()
-        .append("text")
-        .style("text-anchor", function(d){
-            return midAngle(d) < Math.PI ? "start":"end";
-        });
-    
-    text.append("tspan")
-        .attr("x", "0")
-        .attr("dy", "-0.3em")
-        .attr("font-weight", "bold")
-        .attr("font-size", "120%")
-        .text(function(d) {
-            return d.data.label;
-        });
-    text.append("tspan")
-        .attr("x", "0")
-        .attr("dy", "1.2em")
-        .text(function(d) {
-            return d.data.value.toFixed(2) + " %";
-        });
-    
-    text.attr("transform", function(d) {
-        var pos = outerArc.centroid(d);
-        pos[0] = radius * 0.95 * (midAngle(d) < Math.PI ? 1 : -1);
-        return "translate("+ pos +")";
-    })
-
-    /* ------- SLICE TO TEXT POLYLINES ------- */
-    var polyline = svg.select(".lines").selectAll("polyline")
-        .data(pie(data), key)
-        .enter()
-        .append("polyline")
-        .attr("style", "opacity: .3; stroke: black; stroke-width: 2px; fill: none;")
-        .attr("points", function(d){
-            var pos = outerArc.centroid(d);
-            pos[0] = radius * 0.9 * (midAngle(d) < Math.PI ? 1 : -1);
-            return [arc.centroid(d), outerArc.centroid(d), pos];
-        });
-</script>
+<script src="{{ url_for('static', filename='js/pie_chart.js') }}"></script>
 {% endblock %}

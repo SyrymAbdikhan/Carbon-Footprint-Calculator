@@ -145,25 +145,5 @@
 
 
 {% block script %}
-<script>
-    // Get the elements
-    var rangeInput = document.getElementById('waste-recycled-range');
-    var numberInput = document.getElementById('waste-recycled-number');
-
-    // Function to update the number input
-    function updateNumberInput() {
-        numberInput.value = rangeInput.value;
-    }
-
-    // Function to update the range input
-    function updateRangeInput() {
-        rangeInput.value = numberInput.value;
-    }
-
-    // Add event listener to the range input
-    rangeInput.addEventListener('input', updateNumberInput);
-
-    // Add event listener to the number input
-    numberInput.addEventListener('input', updateRangeInput);
-</script>
+<script src="{{ url_for('static', filename='js/input_binder.js') }}"></script>
 {% endblock %}
