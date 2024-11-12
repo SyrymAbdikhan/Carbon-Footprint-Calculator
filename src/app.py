@@ -8,8 +8,7 @@ from flask import Flask, request, redirect, render_template
 from sqlalchemy import desc
 
 from dotenv import load_dotenv
-load_dotenv('.env')
-
+load_dotenv('.env', override=True)
 
 basedir = os.path.abspath(os.path.dirname(__file__))
 
@@ -61,7 +60,7 @@ def calculator():
     db.session.add(comp_emisson)
     db.session.commit()
 
-    return redirect(f'/results/?result_id={comp_emisson.id}')
+    return redirect(f'/result/?result_id={comp_emisson.id}')
 
 
 @app.route('/noresults/')
@@ -69,8 +68,8 @@ def noresults():
     return render_template('noresults.html')
 
 
-@app.route('/results/')
-def results():
+@app.route('/result/')
+def result():
     result_id = request.args.get('result_id', None, type=int)
     if result_id is None:
         redirect('index')
@@ -79,7 +78,7 @@ def results():
     if data is None:
         return redirect('/noresults')
 
-    return render_template('results.html', data=data, averages=get_db_average())
+    return render_template('result.html', data=data, averages=get_db_average())
 
 
 @app.route('/get_suggestion/')
@@ -118,8 +117,8 @@ def get_suggestion():
     }
 
 
-@app.route('/all_results/')
-def all_results():
+@app.route('/results/')
+def results():
     page = request.args.get('page', 1, type=int)
 
     pagination = CompanyEmissions.query.order_by(
@@ -129,8 +128,8 @@ def all_results():
     if pagination is None:
         return redirect('/noresults')
 
-    return render_template('all_results.html', pagination=pagination)
+    return render_template('results.html', pagination=pagination)
 
 
 if __name__ == '__main__':
-    app.run(port=8888)
+    app.run(port=8888, debug=1)
