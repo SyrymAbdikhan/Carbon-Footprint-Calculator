@@ -91,29 +91,29 @@ def get_suggestion():
         }
 
     data = CompanyEmissions.query.filter_by(id=result_id).first()
-    if data.suggestion is None:
-        response = get_ai_suggestion(data)
-        if response['status_code'] != 0:
-            return {
-                'status_code': 2,
-                'response': response['suggestion']
-            }
-
-        suggestion = ReductionSuggestions(
-            result_id=result_id,
-            suggestion=response['suggestion']
-        )
-        db.session.add(suggestion)
-        db.session.commit()
-
+    if data.suggestion is not None:
         return {
             'status_code': 0,
+            'response': data.suggestion.suggestion
+        }
+
+    response = get_ai_suggestion(data)
+    if response['status_code'] != 0:
+        return {
+            'status_code': 2,
             'response': response['suggestion']
         }
 
+    suggestion = ReductionSuggestions(
+        result_id=result_id,
+        suggestion=response['suggestion']
+    )
+    db.session.add(suggestion)
+    db.session.commit()
+
     return {
         'status_code': 0,
-        'response': data.suggestion.suggestion
+        'response': response['suggestion']
     }
 
 
@@ -132,4 +132,4 @@ def results():
 
 
 if __name__ == '__main__':
-    app.run(port=8888, debug=1)
+    app.run(port=8888)
