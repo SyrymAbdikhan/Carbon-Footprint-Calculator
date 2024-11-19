@@ -1,11 +1,11 @@
-
 #suggestion h1 {
     margin-top: 1rem;
     font-weight: bold;
     font-size: large;
 }
 
-#suggestion ul, #suggestion ol {
+#suggestion ul,
+#suggestion ol {
     margin-left: 1rem;
 }
 
@@ -26,4 +26,12 @@
 
 #suggestion strong {
     font-weight: 700;
+}
+
+@media print {
+    * {
+        color-adjust: exact !important;
+        -webkit-print-color-adjust: exact !important;
+        print-color-adjust: exact !important;
+    }
 }
