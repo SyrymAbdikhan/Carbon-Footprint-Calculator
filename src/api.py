@@ -41,3 +41,29 @@ def get_suggestion():
         'status_code': 0,
         'response': response['suggestion']
     }
+
+
+@api_bp.route('/data/')
+def data():
+    query = CompanyEmissions.query
+    
+    # search filter
+    search = request.args.get('search[value]')
+    if search:
+        query = query.filter(db.or_(
+            CompanyEmissions.id.like(f'%{search}%'),
+            CompanyEmissions.name.like(f'%{search}%')
+        ))
+    total_filtered = query.count()
+
+    # pagination
+    start = request.args.get('start', type=int)
+    length = request.args.get('length', type=int)
+    query = query.offset(start).limit(length)
+
+    return {
+        'data': [user.to_dict() for user in query],
+        'recordsFiltered': total_filtered,
+        'recordsTotal': CompanyEmissions.query.count(),
+        'draw': request.args.get('draw', type=int),
+    }

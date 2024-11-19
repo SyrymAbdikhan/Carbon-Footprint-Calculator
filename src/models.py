@@ -28,6 +28,17 @@ class CompanyEmissions(db.Model):
     total_co2 = db.Column(db.Float)
     
     suggestion = db.relationship('ReductionSuggestions', backref='company_emissions', uselist=False)
+    
+    def to_dict(self):
+        return {
+            'id': self.id,
+            'name': self.name,
+            'created_at': self.created_at,
+            'energy_co2': self.energy_co2,
+            'waste_co2': self.waste_co2,
+            'travel_co2': self.travel_co2,
+            'total_co2': self.total_co2
+        }
 
     def __repr__(self):
         return f"<CompanyEmissions {self.id}>"

@@ -6,7 +6,6 @@ from models import db, CompanyEmissions
 from api import api_bp
 
 from flask import Flask, request, redirect, render_template
-from sqlalchemy import desc
 
 from dotenv import load_dotenv
 load_dotenv('.env', override=True)
@@ -87,16 +86,7 @@ def result():
 
 @app.route('/results/')
 def results():
-    page = request.args.get('page', 1, type=int)
-
-    pagination = CompanyEmissions.query.order_by(
-        desc(CompanyEmissions.created_at)
-    ).paginate(page=page, per_page=10)
-
-    if pagination is None:
-        return redirect('/noresults')
-
-    return render_template('results.html', pagination=pagination)
+    return render_template('results.html')
 
 
 if __name__ == '__main__':
