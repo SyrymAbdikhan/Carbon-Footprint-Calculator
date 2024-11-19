@@ -10,7 +10,7 @@ btn.addEventListener('click', () => {
     btn.classList.remove("hover:bg-blue-500");
     spinner.style.display = 'block';
 
-    fetch(`/get_suggestion/?result_id=${result_id}`)
+    fetch(`/api/get_suggestion/?result_id=${result_id}`)
         .then((response) => {
             return response.json();
         })

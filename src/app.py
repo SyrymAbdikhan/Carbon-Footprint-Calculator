@@ -1,8 +1,9 @@
 
 import os
 
-from utils import calculate_co2, get_db_average, get_ai_suggestion, cast
-from models import db, CompanyEmissions, ReductionSuggestions
+from utils import calculate_co2, get_db_average, cast
+from models import db, CompanyEmissions
+from api import api_bp
 
 from flask import Flask, request, redirect, render_template
 from sqlalchemy import desc
@@ -13,6 +14,9 @@ load_dotenv('.env', override=True)
 basedir = os.path.abspath(os.path.dirname(__file__))
 
 app = Flask(__name__)
+
+app.register_blueprint(api_bp, url_prefix='/api')
+
 app.secret_key = os.getenv('SECRET_KEY')
 app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///' + \
     os.path.join(basedir, 'database.db')
@@ -79,42 +83,6 @@ def result():
         return redirect('/noresults')
 
     return render_template('result.html', data=data, averages=get_db_average())
-
-
-@app.route('/get_suggestion/')
-def get_suggestion():
-    result_id = request.args.get('result_id', None, type=int)
-    if result_id is None:
-        return {
-            'status_code': 1,
-            'response': ''
-        }
-
-    data = CompanyEmissions.query.filter_by(id=result_id).first()
-    if data.suggestion is not None:
-        return {
-            'status_code': 0,
-            'response': data.suggestion.suggestion
-        }
-
-    response = get_ai_suggestion(data)
-    if response['status_code'] != 0:
-        return {
-            'status_code': 2,
-            'response': response['suggestion']
-        }
-
-    suggestion = ReductionSuggestions(
-        result_id=result_id,
-        suggestion=response['suggestion']
-    )
-    db.session.add(suggestion)
-    db.session.commit()
-
-    return {
-        'status_code': 0,
-        'response': response['suggestion']
-    }
 
 
 @app.route('/results/')
