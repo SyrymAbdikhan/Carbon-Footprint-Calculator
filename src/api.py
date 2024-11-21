@@ -7,13 +7,12 @@ from models import db, CompanyEmissions, ReductionSuggestions
 api_bp = Blueprint('api_bp', __name__)
 
 
-@api_bp.route('/get_suggestion/')
-def get_suggestion():
-    result_id = request.args.get('result_id', None, type=int)
+@api_bp.route('/get_suggestion/<int:result_id>')
+def get_suggestion(result_id=None):
     if result_id is None:
         return {
             'status_code': 1,
-            'response': ''
+            'response': 'No result_id was found!'
         }
 
     data = CompanyEmissions.query.filter_by(id=result_id).first()

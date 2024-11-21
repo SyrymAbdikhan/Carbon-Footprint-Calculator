@@ -2,15 +2,16 @@
 var suggestion = document.querySelector('#suggestion');
 var btn = document.querySelector('#generate-suggestion');
 var spinner = document.querySelector('#spinner');
-var url = new URL(window.location.href);
-var result_id = url.searchParams.get("result_id");
+
+var href = window.location.href;
+var result_id = href.substring(href.lastIndexOf('/') + 1);
 
 btn.addEventListener('click', () => {
   btn.classList.add("pointer-events-none");
   btn.classList.remove("hover:bg-blue-500");
   spinner.style.display = 'block';
 
-  fetch(`/api/get_suggestion/?result_id=${result_id}`)
+  fetch(`/api/get_suggestion/${result_id}`)
     .then((response) => {
       return response.json();
     })
