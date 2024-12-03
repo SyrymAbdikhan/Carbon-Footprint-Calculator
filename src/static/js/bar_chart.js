@@ -3,7 +3,7 @@ function updateSingleBarChart(_id, data, color) {
   d3.select(_id).html('');
 
   const margin = { top: 20, right: 30, bottom: 40, left: 70 },
-    width = 1200 - margin.left - margin.right,
+    width = 970 - margin.left - margin.right,
     height = 350 - margin.top - margin.bottom;
 
   const svg = d3.select(_id)
@@ -16,11 +16,10 @@ function updateSingleBarChart(_id, data, color) {
   const parsedData = data.map(d => ({
     name: d.name,
     value: d.value
-  }));
-
-  parsedData.sort(function (a, b) {
-    return d3.ascending(a.value, b.value);
-  });
+  }))
+    .sort((a, b) => {
+      return d3.ascending(a.value, b.value);
+    });
 
   const x = d3.scaleBand()
     .domain(parsedData.map(d => d.name))
@@ -35,9 +34,9 @@ function updateSingleBarChart(_id, data, color) {
     .data(parsedData)
     .enter()
     .append('rect')
-    .attr('x', d => x(d.name) + x.bandwidth()*0.1)
+    .attr('x', d => x(d.name) + x.bandwidth() * 0.1)
     .attr('y', d => y(d.value))
-    .attr('width', x.bandwidth()*0.8)
+    .attr('width', x.bandwidth() * 0.8)
     .attr('height', d => height - y(d.value))
     .attr('fill', color);
 
@@ -54,15 +53,9 @@ function updateSingleBarChart(_id, data, color) {
     .style('font-size', '0.8rem');
 }
 
-function updateBarChart(data) {
-  const parsedData = {
-    energy_co2: data.map(d => ({ name: d.name, value: d.energy_co2 })),
-    waste_co2: data.map(d => ({ name: d.name, value: d.waste_co2 })),
-    travel_co2: data.map(d => ({ name: d.name, value: d.travel_co2 })),
-    total: data.map(d => ({ name: d.name, value: d.energy_co2 + d.waste_co2 + d.travel_co2 }))
-  };
-  updateSingleBarChart('#bar-chart-total', parsedData.total, '#6c757d')
-  updateSingleBarChart('#bar-chart-energy', parsedData.energy_co2, '#6875f5');
-  updateSingleBarChart('#bar-chart-waste', parsedData.waste_co2, '#ff5b1f');
-  updateSingleBarChart('#bar-chart-travel', parsedData.travel_co2, '#0695a2');
+function updateBarCharts(data) {
+  updateSingleBarChart('#bar-chart-total', data.total, '#6c757d')
+  updateSingleBarChart('#bar-chart-energy', data.energy_co2, '#6875f5');
+  updateSingleBarChart('#bar-chart-waste', data.waste_co2, '#ff5b1f');
+  updateSingleBarChart('#bar-chart-travel', data.travel_co2, '#0695a2');
 }

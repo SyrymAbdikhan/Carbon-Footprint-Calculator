@@ -14,15 +14,29 @@ $(document).ready(function () {
     ],
   });
 
-  updateBarChart(getFilteredData());
+  updateData(getData());
 
   $('#data').on('draw.dt', function () {
-    updateBarChart(getFilteredData());
+    updateData(getData());
   });
 });
 
-function getFilteredData() {
-  return getLatestData(getVisibleData());
+function getData() {
+  let data = getLatestData(getVisibleData());
+  data = {
+    energy_co2: data.map(d => ({ name: d.name, value: d.energy_co2 })),
+    waste_co2: data.map(d => ({ name: d.name, value: d.waste_co2 })),
+    travel_co2: data.map(d => ({ name: d.name, value: d.travel_co2 })),
+    total: data.map(d => ({ name: d.name, value: d.energy_co2 + d.waste_co2 + d.travel_co2 }))
+  };
+  return data;
+}
+
+function updateData(data) {
+  if (data.total.length > 0) {
+    updateBarCharts(data);
+    updateBoxPlots(data);
+  }
 }
 
 function getVisibleData() {
