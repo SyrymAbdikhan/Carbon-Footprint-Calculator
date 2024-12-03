@@ -1,97 +1,68 @@
 
-function updateBarChart(data) {
-  d3.select('#barChart').html('');
+function updateSingleBarChart(_id, data, color) {
+  d3.select(_id).html('');
 
   const margin = { top: 20, right: 30, bottom: 40, left: 70 },
     width = 1200 - margin.left - margin.right,
-    height = 400 - margin.top - margin.bottom;
+    height = 350 - margin.top - margin.bottom;
 
-  const svg = d3.select('#barChart')
+  const svg = d3.select(_id)
     .append('svg')
     .attr('width', width + margin.left + margin.right)
     .attr('height', height + margin.top + margin.bottom)
     .append('g')
     .attr('transform', `translate(${margin.left},${margin.top})`);
 
-  const categories = ['Energy Usage', 'Waste', 'Travel'];
   const parsedData = data.map(d => ({
     name: d.name,
-    values: [
-      { category: 'Energy Usage', value: d.energy_co2 },
-      { category: 'Waste', value: d.waste_co2 },
-      { category: 'Travel', value: d.travel_co2 },
-    ],
+    value: d.value
   }));
 
   parsedData.sort(function (a, b) {
-    return d3.ascending(a.name, b.name)
+    return d3.ascending(a.value, b.value);
   });
 
-  const x0 = d3.scaleBand()
+  const x = d3.scaleBand()
     .domain(parsedData.map(d => d.name))
     .range([0, width])
     .padding(0.2);
 
-  const x1 = d3.scaleBand() // Sub-bars
-    .domain(categories)
-    .range([0, x0.bandwidth()])
-    .padding(0.1);
-
   const y = d3.scaleLinear()
-    .domain([0, d3.max(parsedData, d => d3.max(d.values, v => v.value))])
+    .domain([0, d3.max(parsedData, d => d.value)])
     .range([height, 0]);
 
-  const color = d3.scaleOrdinal()
-    .domain(categories)
-    .range(["#6875f5", "#ff5b1f", "#0695a2"]);
-
-  const groups = svg.selectAll('g.group')
+  svg.selectAll('rect')
     .data(parsedData)
     .enter()
-    .append('g')
-    .attr('class', 'group')
-    .attr('transform', d => `translate(${x0(d.name)},0)`);
-
-  groups.selectAll('rect')
-    .data(d => d.values)
-    .enter()
     .append('rect')
-    .attr('x', d => x1(d.category))
+    .attr('x', d => x(d.name) + x.bandwidth()*0.1)
     .attr('y', d => y(d.value))
-    .attr('width', x1.bandwidth())
+    .attr('width', x.bandwidth()*0.8)
     .attr('height', d => height - y(d.value))
-    .attr('fill', d => color(d.category));
+    .attr('fill', color);
 
-  // X axis Categories
   svg.append('g')
     .attr('transform', `translate(0,${height})`)
-    .call(d3.axisBottom(x0))
+    .call(d3.axisBottom(x))
     .selectAll('text')
     .attr('transform', 'rotate(-15)')
     .style('text-anchor', 'end')
     .style('font-size', '0.8rem');
 
-  // Y axis Values
   svg.append('g')
     .call(d3.axisLeft(y))
     .style('font-size', '0.8rem');
+}
 
-  const legend = svg.append('g')
-    .attr('transform', `translate(${width - 100}, 0)`);
-
-  categories.forEach((cat, i) => {
-    legend.append('rect')
-      .attr('x', 0)
-      .attr('y', i * 20)
-      .attr('width', 10)
-      .attr('height', 10)
-      .attr('fill', color(cat));
-
-    legend.append('text')
-      .attr('x', 15)
-      .attr('y', i * 20 + 6)
-      .text(cat)
-      .style('font-size', '12px')
-      .attr('alignment-baseline', 'middle');
-  });
+function updateBarChart(data) {
+  const parsedData = {
+    energy_co2: data.map(d => ({ name: d.name, value: d.energy_co2 })),
+    waste_co2: data.map(d => ({ name: d.name, value: d.waste_co2 })),
+    travel_co2: data.map(d => ({ name: d.name, value: d.travel_co2 })),
+    total: data.map(d => ({ name: d.name, value: d.energy_co2 + d.waste_co2 + d.travel_co2 }))
+  };
+  updateSingleBarChart('#bar-chart-total', parsedData.total, '#6c757d')
+  updateSingleBarChart('#bar-chart-energy', parsedData.energy_co2, '#6875f5');
+  updateSingleBarChart('#bar-chart-waste', parsedData.waste_co2, '#ff5b1f');
+  updateSingleBarChart('#bar-chart-travel', parsedData.travel_co2, '#0695a2');
 }

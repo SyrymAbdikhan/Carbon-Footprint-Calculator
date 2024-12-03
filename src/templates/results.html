@@ -8,7 +8,44 @@
 
 {% block content %}
 <div class="px-4 mx-auto">
-  <div class="overflow-x-auto mb-4" id="barChart"></div>
+  <div class="mb-4 border-b border-gray-200 dark:border-gray-700">
+    <ul class="flex flex-wrap -mb-px text-sm font-medium text-center" id="default-tab" data-tabs-toggle="#default-tab-content" role="tablist">
+      <li class="me-2" role="presentation">
+        <button class="inline-block p-4 border-b-2 rounded-t-lg hover:text-gray-600 hover:border-gray-300 dark:hover:text-gray-300" id="total-tab" data-tabs-target="#total" type="button" role="tab" aria-controls="total" aria-selected="false">
+          Total
+        </button>
+      </li>
+      <li class="me-2" role="presentation">
+        <button class="inline-block p-4 border-b-2 rounded-t-lg hover:text-gray-600 hover:border-gray-300 dark:hover:text-gray-300" id="energy-tab" data-tabs-target="#energy" type="button" role="tab" aria-controls="energy" aria-selected="false">
+          Energy Usage
+        </button>
+      </li>
+      <li class="me-2" role="presentation">
+        <button class="inline-block p-4 border-b-2 rounded-t-lg hover:text-gray-600 hover:border-gray-300 dark:hover:text-gray-300" id="waste-tab" data-tabs-target="#waste" type="button" role="tab" aria-controls="waste" aria-selected="false">
+          Waste
+        </button>
+      </li>
+      <li role="presentation">
+        <button class="inline-block p-4 border-b-2 rounded-t-lg hover:text-gray-600 hover:border-gray-300 dark:hover:text-gray-300" id="travel-tab" data-tabs-target="#travel" type="button" role="tab" aria-controls="travel" aria-selected="false">
+          Travel
+        </button>
+      </li>
+    </ul>
+  </div>
+  <div id="default-tab-content">
+    <div class="hidden" id="total" role="tabpanel" aria-labelledby="total-tab">
+      <div class="overflow-x-auto mb-4" id="bar-chart-total"></div>
+    </div>
+    <div class="hidden" id="energy" role="tabpanel" aria-labelledby="energy-tab">
+      <div class="overflow-x-auto mb-4" id="bar-chart-energy"></div>
+    </div>
+    <div class="hidden" id="waste" role="tabpanel" aria-labelledby="waste-tab">
+      <div class="overflow-x-auto mb-4" id="bar-chart-waste"></div>
+    </div>
+    <div class="hidden" id="travel" role="tabpanel" aria-labelledby="travel-tab">
+      <div class="overflow-x-auto mb-4" id="bar-chart-travel"></div>
+    </div>
+  </div>
 
   <div class="relative sm:rounded-lg mb-3">
     <table class="w-full text-sm text-left rtl:text-right text-gray-500" id="data">
