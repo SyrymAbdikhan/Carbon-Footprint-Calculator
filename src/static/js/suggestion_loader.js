@@ -6,10 +6,20 @@ var spinner = document.querySelector('#spinner');
 var href = window.location.href;
 var result_id = href.substring(href.lastIndexOf('/') + 1);
 
-btn.addEventListener('click', () => {
+function spinner_show() {
   btn.classList.add("pointer-events-none");
   btn.classList.remove("hover:bg-blue-500");
   spinner.style.display = 'block';
+}
+
+function spinner_hide() {
+  btn.classList.remove("pointer-events-none");
+  btn.classList.add("hover:bg-blue-500");
+  spinner.style.display = 'none';
+}
+
+btn.addEventListener('click', () => {
+  spinner_show()
 
   fetch(`/api/get_suggestion/${result_id}`)
     .then((response) => {
@@ -21,13 +31,12 @@ btn.addEventListener('click', () => {
         prettify(suggestion);
       } else {
         alert(data.response);
+        spinner_hide()
       }
     })
     .catch(() => {
       alert('oblom');
-      btn.classList.remove("pointer-events-none");
-      btn.classList.add("hover:bg-blue-500");
-      spinner.style.display = 'none';
+      spinner_hide()
     });
 });
 
