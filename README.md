@@ -13,8 +13,6 @@ _**Carbon Footprint Calculator** is a web application designed to help companies
 - ![D3.js](https://img.shields.io/badge/d3%20js-F9A03C?style=for-the-badge&logo=d3.js&logoColor=white)
 - ![JQuery](https://img.shields.io/badge/jQuery-0769AD?style=for-the-badge&logo=jquery&logoColor=white)
 
-## [Demo 💥]()
-
 ## Features
 
 - Carbon footprint calculator
@@ -83,4 +81,4 @@ $ flask run
 
 ## License
 
-This project is licensed under the MIT License. See the [LICENSE]() file for details.
+This project is licensed under the MIT License. See the [LICENSE](https://github.com/SyrymAbdikhan/Carbon-Footprint-Calculator/blob/main/LICENSE) file for details.
