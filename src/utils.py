@@ -96,8 +96,9 @@ def calculate_co2(data: dict):
     )
 
     total_travel = (
-        data.get('km-traveled', 0) *
-        (1 / data.get('fuel-eff', 0)) * 2.31
+        data.get('km-traveled', 0) * data.get('fuel-eff', 0) * 2.31
+        # changed ... * (1 / fuel-eff)
+        # to ... * fuel-eff
     )
 
     total_energy_usage = round(total_energy_usage, 2)

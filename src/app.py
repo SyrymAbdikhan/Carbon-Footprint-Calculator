@@ -5,7 +5,7 @@ from utils import calculate_co2, get_db_average, cast
 from models import db, CompanyEmissions
 from api import api_bp
 
-from flask import Flask, request, redirect, render_template
+from flask import Flask, request, redirect, render_template, url_for
 
 from dotenv import load_dotenv
 load_dotenv('.env', override=True)
@@ -63,7 +63,7 @@ def calculator():
     db.session.add(comp_emisson)
     db.session.commit()
 
-    return redirect(f'/result/{comp_emisson.id}')
+    return redirect(url_for('result', result_id=comp_emisson.id))
 
 
 @app.route('/noresults/')
@@ -75,11 +75,11 @@ def noresults():
 @app.route('/result/<int:result_id>')
 def result(result_id=None):
     if result_id is None:
-        redirect('index')
+        redirect(url_for('index'))
 
     data = CompanyEmissions.query.filter_by(id=result_id).first()
     if data is None:
-        return redirect('/noresults')
+        return redirect(url_for('noresults'))
 
     return render_template('result.html', data=data, averages=get_db_average())
 
