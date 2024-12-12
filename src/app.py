@@ -64,5 +64,10 @@ def results():
     return render_template('results.html')
 
 
+@app.errorhandler(404)
+def error_404(e):
+    return render_template('error.html')
+
+
 if __name__ == '__main__':
     app.run(port=8888)
