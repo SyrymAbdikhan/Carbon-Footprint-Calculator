@@ -1,9 +1,9 @@
 
 import os
 
-from utils import calculate_co2, get_db_average, cast
-from models import db, CompanyEmissions
 from api import api_bp
+from models import db, CompanyEmissions
+from utils import process_data, get_db_average
 
 from flask import Flask, request, redirect, render_template, url_for
 
@@ -34,36 +34,10 @@ def calculator():
     if request.method == 'GET':
         return render_template('calculator.html')
 
-    data = {
-        'elec-bill': cast(request.form.get('elec-bill', 0), float, 0),
-        'gas-bill': cast(request.form.get('gas-bill', 0), float, 0),
-        'fuel-bill': cast(request.form.get('fuel-bill', 0), float, 0),
-        'waste-kg': cast(request.form.get('waste-kg', 0), float, 0),
-        'recycle-pct': cast(request.form.get('recycle-pct', 0), float, 0),
-        'km-traveled': cast(request.form.get('km-traveled', 0), float, 0),
-        'fuel-eff': cast(request.form.get('fuel-eff', 0), float, 0)
-    }
-    resp = calculate_co2(data)
+    data = request.form.to_dict()
+    result_id = process_data(data)
 
-    comp_emisson = CompanyEmissions(
-        name=request.form.get('comp-name', 'Unknown'),
-        elec_bill=data.get('elec-bill', 0),
-        gas_bill=data.get('gas-bill', 0),
-        fuel_bill=data.get('fuel-bill', 0),
-        waste_kg=data.get('waste-kg', 0),
-        recycle_pct=data.get('recycle-pct', 0),
-        km_traveled=data.get('km-traveled', 0),
-        fuel_eff=data.get('fuel-eff', 0),
-        energy_co2=resp.get('energy-usage', 0),
-        waste_co2=resp.get('waste', 0),
-        travel_co2=resp.get('travel', 0),
-        total_co2=resp.get('total', 0),
-    )
-
-    db.session.add(comp_emisson)
-    db.session.commit()
-
-    return redirect(url_for('result', result_id=comp_emisson.id))
+    return redirect(url_for('result', result_id=result_id))
 
 
 @app.route('/noresults/')

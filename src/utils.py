@@ -81,6 +81,40 @@ def get_ai_suggestion(company: CompanyEmissions, averages: dict = None):
         }
 
 
+def process_data(data: dict):
+    fields = ['elec-bill', 'gas-bill', 'fuel-bill',
+              'waste-kg', 'recycle-pct', 'km-traveled', 'fuel-eff']
+    for field in fields:
+        data[field] = cast(data.get(field, 0), float, 0)
+
+    resp = calculate_co2(data)
+    result_id = save_results(data.get('comp-name', 'Unknown'), data, resp)
+    
+    return result_id
+
+
+def save_results(name: str, input_data: dict, result_data: dict):
+    comp_emisson = CompanyEmissions(
+        name=name,
+        elec_bill=input_data.get('elec-bill', 0),
+        gas_bill=input_data.get('gas-bill', 0),
+        fuel_bill=input_data.get('fuel-bill', 0),
+        waste_kg=input_data.get('waste-kg', 0),
+        recycle_pct=input_data.get('recycle-pct', 0),
+        km_traveled=input_data.get('km-traveled', 0),
+        fuel_eff=input_data.get('fuel-eff', 0),
+        energy_co2=result_data.get('energy-usage', 0),
+        waste_co2=result_data.get('waste', 0),
+        travel_co2=result_data.get('travel', 0),
+        total_co2=result_data.get('total', 0),
+    )
+
+    db.session.add(comp_emisson)
+    db.session.commit()
+
+    return comp_emisson.id
+
+
 def calculate_co2(data: dict):
     total_energy_usage = (
         data.get('elec-bill', 0) * 12 * 0.0005 +
