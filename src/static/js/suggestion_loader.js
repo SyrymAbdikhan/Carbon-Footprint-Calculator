@@ -19,7 +19,7 @@ function spinner_hide() {
 }
 
 btn.addEventListener('click', () => {
-  spinner_show()
+  spinner_show();
 
   fetch(`/api/get_suggestion/${result_id}`)
     .then((response) => {
@@ -31,12 +31,12 @@ btn.addEventListener('click', () => {
         prettify(suggestion);
       } else {
         alert(data.response);
-        spinner_hide()
+        spinner_hide();
       }
     })
-    .catch(() => {
-      alert('oblom');
-      spinner_hide()
+    .catch((e) => {
+      console.log(e);
+      spinner_hide();
     });
 });
 
