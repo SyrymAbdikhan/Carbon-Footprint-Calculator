@@ -1,8 +1,9 @@
 
-from utils import get_ai_suggestion
-
 from flask import Blueprint, request
-from models import db, CompanyEmissions, ReductionSuggestions
+
+from utils import ai_funcs
+from utils import db_funcs
+from models import db, CompanyEmissions
 
 api_bp = Blueprint('api_bp', __name__)
 
@@ -15,26 +16,21 @@ def get_suggestion(result_id=None):
             'response': 'No result_id was found!'
         }
 
-    data = CompanyEmissions.query.filter_by(id=result_id).first()
+    data = db_funcs.get_results(result_id)
     if data.suggestion is not None:
         return {
             'status_code': 0,
             'response': data.suggestion.suggestion
         }
 
-    response = get_ai_suggestion(data)
+    response = ai_funcs.get_suggestion(data)
     if response['status_code'] != 0:
         return {
             'status_code': 2,
             'response': response['suggestion']
         }
 
-    suggestion = ReductionSuggestions(
-        result_id=result_id,
-        suggestion=response['suggestion']
-    )
-    db.session.add(suggestion)
-    db.session.commit()
+    db_funcs.save_suggestion(result_id, response['suggestion'])
 
     return {
         'status_code': 0,
@@ -45,7 +41,7 @@ def get_suggestion(result_id=None):
 @api_bp.route('/data/')
 def data():
     query = CompanyEmissions.query
-    
+
     # search filter
     search = request.args.get('search[value]')
     if search:
